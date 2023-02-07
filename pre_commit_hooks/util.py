@@ -24,7 +24,6 @@ def last_commit_id() -> str:
         subprocess.Popen(cmd)
         return last_commit_id()
 
-    print(out, len(out))
     return out
 
 def cmd_output(*cmd: str, retcode: int | None = 0, **kwargs: Any) -> str:
