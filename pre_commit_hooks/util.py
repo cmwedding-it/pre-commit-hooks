@@ -3,15 +3,29 @@ from __future__ import annotations
 import subprocess
 from typing import Any
 
+def current_branch() -> str:
+    cmd = ('git', 'branch', '--show-current', '--no-color')
+    out = cmd_output(*cmd).strip()
 
-class CalledProcessError(RuntimeError):
-    pass
+    if not out or len(out) == 0:
+        raise RuntimeError
 
+    return out
 
-def added_files() -> set[str]:
-    cmd = ('git', 'diff', '--staged', '--name-only', '--diff-filter=A')
-    return set(cmd_output(*cmd).splitlines())
+def last_commit_id() -> str:
+    cmd = ('git',  'log',  '-1', '--pretty=format:%h')
+    out = cmd_output(*cmd).strip()
 
+    if not out:
+        raise RuntimeError
+
+    if len(out) != 8:
+        cmd = ('git', 'config', '--global', 'core.abbrev', '8')
+        subprocess.Popen(cmd)
+        return last_commit_id()
+
+    print(out, len(out))
+    return out
 
 def cmd_output(*cmd: str, retcode: int | None = 0, **kwargs: Any) -> str:
     kwargs.setdefault('stdout', subprocess.PIPE)
@@ -20,13 +34,5 @@ def cmd_output(*cmd: str, retcode: int | None = 0, **kwargs: Any) -> str:
     stdout, stderr = proc.communicate()
     stdout = stdout.decode()
     if retcode is not None and proc.returncode != retcode:
-        raise CalledProcessError(cmd, retcode, proc.returncode, stdout, stderr)
+        raise RuntimeError(cmd, retcode, proc.returncode, stdout, stderr)
     return stdout
-
-
-def zsplit(s: str) -> list[str]:
-    s = s.strip('\0')
-    if s:
-        return s.split('\0')
-    else:
-        return []
