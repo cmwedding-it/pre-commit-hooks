@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import subprocess
+import os
 from typing import Any
 
 def current_branch() -> str:
@@ -35,3 +36,11 @@ def cmd_output(*cmd: str, retcode: int | None = 0, **kwargs: Any) -> str:
     if retcode is not None and proc.returncode != retcode:
         raise RuntimeError(cmd, retcode, proc.returncode, stdout, stderr)
     return stdout
+
+def try_chmod(filename) -> int:
+    try:
+        os.chmod(filename, 0o770)
+    except Exception:
+        return 1
+
+    return 0

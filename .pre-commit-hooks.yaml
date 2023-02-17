@@ -4,3 +4,9 @@
     entry: set-module-version
     language: python
     types: [python]
+
+-   id: set-perms-rw-for-g
+    name: set file perms to g+rw
+    description: change all files permission to 770
+    entry: set-perms-rw-for-g
+    language: python
